@@ -5,12 +5,14 @@ import Home from '../pages/Home'
 import About from '../pages/About'  
 import Recipies from '../pages/Recipies'
 import Create from '../pages/Create'
+import Singlerecipie from '../pages/Singlerecipie'
 const Mainroutes = () => {
   return (
   <Routes>
     <Route path="/" element={<Home/>} />
     <Route path="/about" element={<About/>} />
     <Route path="/recipies" element={<Recipies/>}/>
+    <Route path="/recipies/details/:id" element={<Singlerecipie/>}/>
     <Route path="/create-recepies" element={<Create/>}/>
 
   </Routes>
