@@ -30,7 +30,7 @@ const RecipeContext = (props) => {
     "Bake in the preheated oven for 12-15 minutes or until the crust is golden brown.",
     "Slice and serve hot."
   ],
-  category: "Dinner",
+  category: "dinner",
   chef : "Turban Tadka"
 
   
