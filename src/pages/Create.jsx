@@ -21,6 +21,7 @@ const Create = () => {
     copydata.push(recipiedata);
     setdata(copydata);
     toast.success('Recipie added successfully');
+    localStorage.setItem('recipies',JSON.stringify(copydata))
     reset();
     navigate('/recipies');
   };

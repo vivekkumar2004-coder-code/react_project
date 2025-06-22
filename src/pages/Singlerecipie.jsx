@@ -1,16 +1,20 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext,useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faBookmark,
   faArrowLeft,
   faClock,
   faUtensils,
 } from "@fortawesome/free-solid-svg-icons";
-import { faSearchengin } from "@fortawesome/free-brands-svg-icons";
+
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
-import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
+import {
+  faStar as regularStar,
+  faBookmark as regularBookmark,
+} from "@fortawesome/free-regular-svg-icons";
 import { recipecontext } from "../context/RecipeContext";
 import { useParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 const Singlerecipie = () => {
@@ -52,7 +56,28 @@ const Singlerecipie = () => {
     const copy = [...data];
     copy[index] = { ...copy[index], ...recipiedata };
     setdata(copy);
+    localStorage.setItem("recipies", JSON.stringify(copy));
     toast.success("Recipe updated successfully");
+  };
+
+  const [favorite, setfavorite] = useState(
+    JSON.parse(localStorage.getItem("fav")) || []
+  );
+
+  const addFavorite = (e) => {
+    
+    let copyData = [...favorite];
+    copyData.push(recepie);
+    setfavorite(copyData);
+    localStorage.setItem("fav", JSON.stringify(copyData));
+    toast.success("Recipe added to favorites");
+  };
+
+  const unFavorite = (e) => {
+    const filtered = favorite.filter((r) => r.id !== recepie.id);
+    setfavorite(filtered);
+    localStorage.setItem("fav", JSON.stringify(filtered));
+    toast.success("Recipe removed from favorites");
   };
 
   const deleteHandler = () => {
@@ -60,6 +85,12 @@ const Singlerecipie = () => {
     setdata(filtered);
     toast.success("Recipe deleted successfully");
     navigate("/recipies");
+    localStorage.setItem("recipies", JSON.stringify(filtered));
+
+    const filteredfav = favorite.filter((r)=>r.id !== params.id)
+    setfavorite(filteredfav);
+    localStorage.setItem("fav",JSON.stringify(filteredfav));
+    
   };
 
   useEffect(() => {
@@ -68,6 +99,8 @@ const Singlerecipie = () => {
       console.log("Single Recipe component unmounted");
     };
   }, []);
+
+  
 
   const renderList = (items) => {
     if (!Array.isArray(items)) {
@@ -94,7 +127,23 @@ const Singlerecipie = () => {
           onClick={() => navigate(-1)}
         />
         <h1 className="font-semibold text-gray-700">Generic information</h1>
-        <FontAwesomeIcon icon={faSearchengin} className="text-xl text-black" />
+        <div>
+          {favorite.find((f) => {
+            return f.id === recepie?.id;
+          }) ? (
+            <FontAwesomeIcon
+              onClick={unFavorite}
+              icon={faBookmark}
+              className="cursor-pointer absolute right-[8rem] text-xl text-black "
+            />
+          ) : (
+            <FontAwesomeIcon
+              onClick={addFavorite}
+              icon={regularBookmark}
+              className="absolute cursor-pointer right-[8rem] text-xl text-black "
+            />
+          )}
+        </div>
       </div>
 
       {/* Main Content */}
@@ -163,23 +212,59 @@ const Singlerecipie = () => {
 
       <div className="edit-form bg-gray-800 text-white flex justify-center items-center p-6 mt-8 rounded-lg w-[100%]">
         <form>
-          <input className="border-b outline-0 p-2 block" {...register("title")} type="text" placeholder="Recipe title" />
-          <input className="border-b outline-0 p-2 block" {...register("URL")} type="url" placeholder="Recipe image URL" />
-          <textarea className="border-b outline-0 p-2 block" {...register("description")} placeholder="Recipe description" />
-          <textarea className="border-b outline-0 p-2 block" {...register("ingredients")} placeholder="Recipe ingredients (comma separated)" />
-          <textarea className="border-b outline-0 p-2 block" {...register("instructions")} placeholder="Recipe instructions (comma separated)" />
-          <select className="border-b outline-0 p-2 block" {...register("category")}> 
+          <input
+            className="border-b outline-0 p-2 block"
+            {...register("title")}
+            type="text"
+            placeholder="Recipe title"
+          />
+          <input
+            className="border-b outline-0 p-2 block"
+            {...register("URL")}
+            type="url"
+            placeholder="Recipe image URL"
+          />
+          <textarea
+            className="border-b outline-0 p-2 block"
+            {...register("description")}
+            placeholder="Recipe description"
+          />
+          <textarea
+            className="border-b outline-0 p-2 block"
+            {...register("ingredients")}
+            placeholder="Recipe ingredients (comma separated)"
+          />
+          <textarea
+            className="border-b outline-0 p-2 block"
+            {...register("instructions")}
+            placeholder="Recipe instructions (comma separated)"
+          />
+          <select
+            className="border-b outline-0 p-2 block"
+            {...register("category")}
+          >
             <option value="breakfast">Breakfast</option>
             <option value="lunch">Lunch</option>
             <option value="dinner">Dinner</option>
             <option value="snack">Snack</option>
             <option value="dessert">Dessert</option>
           </select>
-          <input className="border-b outline-0 p-2 block" {...register("chef")} type="text" placeholder="Chef's Name" />
-          <button onClick={handleSubmit(updateHandler)} className="mt-5 block bg-blue-900 px-4 py-2 rounded-2xl">
+          <input
+            className="border-b outline-0 p-2 block"
+            {...register("chef")}
+            type="text"
+            placeholder="Chef's Name"
+          />
+          <button
+            onClick={handleSubmit(updateHandler)}
+            className="mt-5 block bg-blue-900 px-4 py-2 rounded-2xl"
+          >
             Update Recipe
           </button>
-          <button onClick={deleteHandler} className="mt-5 block bg-red-800 px-4 py-2 rounded-2xl">
+          <button
+            onClick={deleteHandler}
+            className="mt-5 block bg-red-800 px-4 py-2 rounded-2xl"
+          >
             Delete Recipe
           </button>
         </form>
